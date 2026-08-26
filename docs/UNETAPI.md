@@ -1,6 +1,6 @@
 Читать по-русски: [UNETAPIRU.md](UNETAPIRU.md).
 
-> Vendored into unet_libs from the sprinter_wifi/network project
+> Vendored into sprinter_unet_libs_asm from the sprinter_wifi/network project
 > (`docs/UNETAPI.md`, UNETESP 0.2.41 / UNETRTL 0.2.56). Local changes from
 > the upstream copy are limited to correcting stale `CAP_MULTICHAN`
 > claims - UNETRTL has advertised it since 0.2.5x - see the changelog at
@@ -626,7 +626,7 @@ for the sprinter-rtl8019a project:
   the other channel needs servicing. See `sprinter-rtl8019a/docs/UNETRTL.md`
   ("Two channels") for the full detail.
 
-## Changelog (unet_libs vendoring)
+## Changelog (sprinter_unet_libs_asm vendoring)
 
 - Corrected several stale claims that UNETRTL lacks `CAP_MULTICHAN` /
   two-channel support. UNETRTL has reported `CAP_MULTICHAN` (via

@@ -1,5 +1,5 @@
 ; ======================================================
-; Minimal consumer-side DSS constants for unet_libs.
+; Minimal consumer-side DSS constants for sprinter_unet_libs_asm.
 ;
 ; This is deliberately NOT a merge of the sprinter_wifi/network and
 ; sprinter-rtl8019a copies of dss.inc: those two have diverged (e.g.

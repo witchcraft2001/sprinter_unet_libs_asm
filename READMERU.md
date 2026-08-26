@@ -1,4 +1,4 @@
-# unet_libs
+# sprinter_unet_libs_asm
 
 Единая точка подключения поддержки сети UNET в проект Sprinter (Z80 / DSS)
 в виде git-сабмодуля. В комплекте:
@@ -25,7 +25,7 @@
 ## Подключение как сабмодуля
 
 ```sh
-git submodule add https://github.com/witchcraft2001/unet_libs.git extern/unet_libs
+git submodule add https://github.com/witchcraft2001/sprinter_unet_libs_asm.git extern/unet_libs_asm
 ```
 
 Клонировать (или обновлять) нужно рекурсивно, чтобы подтянулся и вложенный
@@ -42,7 +42,7 @@ git submodule update --init --recursive
 Добавьте два пути `-I` в вызов `sjasmplus`:
 
 ```sh
-sjasmplus -I extern/unet_libs/include -I extern/unet_libs/extern/libman/libman ...
+sjasmplus -I extern/unet_libs_asm/include -I extern/unet_libs_asm/extern/libman/libman ...
 ```
 
 Затем в исходнике задайте опции libman через DEFINE *до* его подключения, а
@@ -146,9 +146,9 @@ DLL можно не поставлять, если нужен только од�
 make            # собрать все четыре примера в build/
 make netinfo    # или только один
 make check      # сверить вендоренные DLL с dll/manifest.json
-make image      # собрать + записать distr/unet_libs.img (FAT12, для
+make image      # собрать + записать distr/unet_libs_asm.img (FAT12, для
                 # эмулятора или настоящей дискеты)
-make package    # собрать + записать distr/unet_libs.zip
+make package    # собрать + записать distr/unet_libs_asm.zip
 ```
 
 Нужен `sjasmplus` в `PATH` (для всех целей) и `mtools` + `iconv` (только для

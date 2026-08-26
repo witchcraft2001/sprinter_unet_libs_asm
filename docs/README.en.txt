@@ -1,4 +1,4 @@
-unet_libs - UNET examples
+sprinter_unet_libs_asm - UNET examples
 
 In this set:
 
@@ -30,4 +30,4 @@ Example (WiFi):
   PING 8.8.8.8
   HTTPGET info.cern.ch
 
-Details and source code: https://github.com/witchcraft2001/unet_libs
+Details and source code: https://github.com/witchcraft2001/sprinter_unet_libs_asm

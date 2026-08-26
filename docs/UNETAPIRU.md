@@ -1,6 +1,6 @@
 Read this in English: [UNETAPI.md](UNETAPI.md).
 
-> Скопировано в unet_libs из проекта sprinter_wifi/network
+> Скопировано в sprinter_unet_libs_asm из проекта sprinter_wifi/network
 > (`docs/UNETAPI.md`, UNETESP 0.2.41 / UNETRTL 0.2.56). Локальные отличия от
 > исходной копии сводятся к исправлению устаревших утверждений про
 > `CAP_MULTICHAN` - UNETRTL объявляет его начиная с 0.2.5x - см. changelog в
@@ -682,7 +682,7 @@ loop:
   когда требуется обслужить другой канал. Полные подробности см. в
   `sprinter-rtl8019a/docs/UNETRTL.md` ("Two channels").
 
-## Changelog (вендоринг в unet_libs)
+## Changelog (вендоринг в sprinter_unet_libs_asm)
 
 - Исправлено несколько устаревших утверждений о том, что в UNETRTL нет
   `CAP_MULTICHAN` / поддержки двух каналов. UNETRTL сообщает `CAP_MULTICHAN`

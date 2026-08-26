@@ -1,4 +1,4 @@
-unet_libs - примеры UNET
+sprinter_unet_libs_asm - примеры UNET
 
 В этом наборе:
 
@@ -29,4 +29,4 @@ unet_libs - примеры UNET
   PING 8.8.8.8
   HTTPGET info.cern.ch
 
-Подробности и исходный код: https://github.com/witchcraft2001/unet_libs
+Подробности и исходный код: https://github.com/witchcraft2001/sprinter_unet_libs_asm

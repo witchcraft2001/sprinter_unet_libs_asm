@@ -2,7 +2,7 @@
 
 # Single source of truth for all runtime artifacts, shared by image.sh and
 # package.sh.
-DIST_NAME="${DIST_NAME:-unet_libs}"
+DIST_NAME="${DIST_NAME:-unet_libs_asm}"
 DIST_FILES=(
   "NETINFO.EXE"
   "PING.EXE"

@@ -1,4 +1,4 @@
-# unet_libs
+# sprinter_unet_libs_asm
 
 A single, submodule-friendly place to get UNET network support into a
 Sprinter (Z80 / DSS) project. It bundles:
@@ -24,7 +24,7 @@ Every document here exists in both languages - Russian versions carry an
 ## Using this as a submodule
 
 ```sh
-git submodule add https://github.com/witchcraft2001/unet_libs.git extern/unet_libs
+git submodule add https://github.com/witchcraft2001/sprinter_unet_libs_asm.git extern/unet_libs_asm
 ```
 
 Consumers must clone (or update) recursively so the nested `libman`
@@ -41,7 +41,7 @@ git submodule update --init --recursive
 Add two include paths to your `sjasmplus` invocation:
 
 ```sh
-sjasmplus -I extern/unet_libs/include -I extern/unet_libs/extern/libman/libman ...
+sjasmplus -I extern/unet_libs_asm/include -I extern/unet_libs_asm/extern/libman/libman ...
 ```
 
 Then, in your source, define libman's options *before* including it, and
@@ -141,9 +141,9 @@ These come from the UNET ABI itself (see `include/unet.inc`) and from DSS:
 make            # build all four examples into build/
 make netinfo    # or just one
 make check      # verify the vendored DLLs against dll/manifest.json
-make image      # build + write distr/unet_libs.img (FAT12, for an emulator
+make image      # build + write distr/unet_libs_asm.img (FAT12, for an emulator
                 # or a real floppy)
-make package    # build + write distr/unet_libs.zip
+make package    # build + write distr/unet_libs_asm.zip
 ```
 
 Requires `sjasmplus` on `PATH` (all targets), and `mtools` + `iconv`
