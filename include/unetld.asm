@@ -43,24 +43,10 @@
         INCLUDE "dss.inc"
         INCLUDE "unet.inc"
 
-; ----------------------------------------------------------------------
-; Error codes, stored in UNETLD.ERROR and returned in A on CF=1. Defined
-; outside MODULE UNETLD so they read as plain UNETLD_E_* everywhere, the
-; same way unet.inc's own UNET_FN_*/NERR_* constants do.
-; ----------------------------------------------------------------------
-UNETLD_E_NOENV          EQU 1   ; NET is not set or empty
-UNETLD_E_BADVALUE       EQU 2   ; NET is not 3-4 chars of [A-Z0-9] (raw value in ENV_VALUE)
-UNETLD_E_LOAD           EQU 3   ; l_load failed (see LIBMAN.l_reason/l_dss_error/...)
-UNETLD_E_INFO           EQU 4   ; l_info failed
-UNETLD_E_NAME           EQU 5   ; the loaded DLL's L1 name does not match NET
-UNETLD_E_CALL           EQU 6   ; libman dispatcher (CF) failure, or GETCAPS returned
-                                 ; a non-OK status during LOAD
-UNETLD_E_ABI            EQU 7   ; GETCAPS major ABI byte != HIGH(UNET_ABI_VERSION)
-UNETLD_E_STATUS         EQU 8   ; STATUS(0FFh) returned neither NERR_OK nor NERR_NONET
-UNETLD_E_NETINIT        EQU 9   ; NETINIT returned a non-OK status (see LAST_STATUS)
-
-UNETLD_F_LOADED         EQU 00000001b   ; bit0 of FLAGS: DLL handle is open
-UNETLD_F_NETINIT        EQU 00000010b   ; bit1 of FLAGS: NETINIT succeeded
+; UNETLD_E_*/UNETLD_F_* (error codes stored in UNETLD.ERROR and returned in
+; A on CF=1; state flag bits) are defined in unet.inc, included above -
+; they are part of the same cross-language ABI as UNET_FN_*/NERR_*, shared
+; with the Pascal and Solid C UNETLD ports. See docs/UNETLD.md.
 
         MODULE  UNETLD
 

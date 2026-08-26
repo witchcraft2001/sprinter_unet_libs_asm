@@ -1,4 +1,4 @@
-.PHONY: all build netinfo ping httpget udpecho check image update-dlls package clean
+.PHONY: all build netinfo ping httpget udpecho check image package clean
 
 all: build
 
@@ -18,13 +18,10 @@ udpecho:
 	tools/build.sh udpecho
 
 check:
-	tools/check_dlls.py
+	LIBMAN_ROOT=extern/libman extern/core/tools/check_dlls.py --require-mkdll
 
 image: build
 	tools/image.sh
-
-update-dlls:
-	tools/update_dlls.sh
 
 package: build
 	tools/package.sh

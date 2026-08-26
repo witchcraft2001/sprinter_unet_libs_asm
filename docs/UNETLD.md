@@ -1,33 +1,32 @@
 Читать по-русски: [UNETLDRU.md](UNETLDRU.md).
 
-# UNETLD reference
+# UNETLD reference (asm)
 
-`include/unetld.asm` is a SjASMPlus code-include that reads the `NET`
-environment variable, resolves it to a UNET backend DLL name, loads that
-DLL through [libman](https://github.com/witchcraft2001/sprinter-libman),
-validates its ABI/capabilities, and gives you a thin wrapper around
-`LIBMAN.l_call` plus a `NETINIT`/`NETDONE` lifecycle.
+`include/unetld.asm` is a SjASMPlus code-include implementing the UNETLD
+loader/selector. This document covers the **asm-specific** parts: the two
+state-placement modes, the exact `CALL UNETLD.<name>` register contracts,
+and integration notes for this repo.
 
-See [docs/UNETAPI.md](UNETAPI.md) for the UNET function contract itself
-(function numbers, register conventions, error codes, capability bits).
-This document only covers the selector/loader layer.
+For the language-neutral *behavior* (the backend-selection algorithm, the
+two independent failure planes, what each entry point does and why, the
+`UNETLD_E_*`/`UNETLD_F_*` codes) see
+[UNETLD-SPEC.md in sprinter_unet_libs_core](https://github.com/witchcraft2001/sprinter_unet_libs_core/blob/main/docs/UNETLD-SPEC.md) -
+that document is the contract this asm implementation, the Pascal port and
+the Solid C port all satisfy identically.
+
+See [UNETAPI.md in core](https://github.com/witchcraft2001/sprinter_unet_libs_core/blob/main/docs/UNETAPI.md)
+for the UNET function contract itself (function numbers, register
+conventions, error codes, capability bits).
 
 ## Backend selection
 
 `NET` must be 3-4 characters from `[A-Z0-9]` (lower-case is accepted and
-upper-cased automatically). The DLL name is built directly from that value:
-
-| `NET` | DLL loaded    |
-| ----- | ------------- |
-| `RTL` | `UNETRTL.DLL` |
-| `WIZ` | `UNETWIZ.DLL` |
-| `3COM`| `UNET3COM.DLL`|
-
-`WIFI` is the one exception, aliased to the `ESP` tag (`UNETESP.DLL`) for
-backward compatibility with existing tooling (`NETUP` publishes `NET=WIFI`).
-See `ALIAS_TABLE` near the end of `unetld.asm` if you need to add another
-alias - a normal new backend that follows the `NET` = DLL-tag convention
-needs no code changes at all, just vendor the matching `UNET<tag>.DLL`.
+upper-cased automatically); the DLL name is built directly from that value
+(`RTL` -> `UNETRTL.DLL`, and so on), with one built-in alias: `WIFI` ->
+`UNETESP.DLL`. See `ALIAS_TABLE` near the end of `unetld.asm` to add
+another - a normal new backend needs no code changes at all, just vendor
+the matching `UNET<tag>.DLL` into core. Full algorithm:
+[UNETLD-SPEC.md#backend-selection-select](https://github.com/witchcraft2001/sprinter_unet_libs_core/blob/main/docs/UNETLD-SPEC.md#backend-selection-select).
 
 ## Two state-placement modes
 
@@ -77,72 +76,24 @@ examples do.
 
 All are called as `CALL UNETLD.<name>`. Register contracts follow the UNET
 convention: arguments in A/DE/IX/IY, CF signals a hard failure, everything
-else is in registers or state.
+else is in registers or state. Behavior: see UNETLD-SPEC.md, linked above.
 
-### `UNETLD.RESET`
-Zero the entire state block. Mandatory once, before anything else, when
-`UNETLD_STATE_BASE` is used. Harmless in simple mode. Safe to call again
-after `UNLOAD`. Out: CF=0.
+| Entry point | In | Out |
+| --- | --- | --- |
+| `UNETLD.RESET` | - | CF=0 |
+| `UNETLD.SELECT` | - | CF=0, `NET_TAG`/`DLL_NAME` set. CF=1, A=`UNETLD_E_NOENV`\|`E_BADVALUE` |
+| `UNETLD.LOAD` | A=window (1 or 2, never 3) | CF=0, HL=handle, DE=caps, IX=ABI. CF=1, A=`E_LOAD`\|`E_INFO`\|`E_NAME`\|`E_CALL`\|`E_ABI` |
+| `UNETLD.CALL` | B=`UNET_FN_*`, args in A/DE/IX/IY | CF=1 only on dispatcher failure; else A=`NERR_*`, results in A/DE/IX/IY |
+| `UNETLD.NETSTART` | - | CF=0, A=0, NETINIT flag set. CF=1, A=`E_CALL`\|`E_STATUS`\|`E_NETINIT` |
+| `UNETLD.REQUIRE` | DE=required `UNET_CAP_*` mask | CF=0 if all bits set in `CAPS`; else CF=1 |
+| `UNETLD.UNLOAD` | - | CF=0 always |
 
-### `UNETLD.SELECT`
-Read `NET`, validate and upper-case it, resolve aliases, build the DLL
-name.
-In: -
-Out: CF=0, `UNETLD.NET_TAG` and `UNETLD.DLL_NAME` set.
-CF=1, A=`UNETLD_E_NOENV` (not set/empty) or `UNETLD_E_BADVALUE` (wrong
-length/charset - the raw value is in `UNETLD.ENV_VALUE`).
+On any `UNETLD.LOAD` failure **except** `E_LOAD`, a DLL handle is already
+open - call `UNLOAD` before retrying or exiting (see UNETLD-SPEC.md).
 
-### `UNETLD.LOAD`
-Load the DLL selected by `SELECT` and validate it.
-In: A = target window, 1 (`0x4000`) or 2 (`0x8000`). **Never 3.** Requires
-a prior successful `SELECT`.
-Out: CF=0, HL=handle, DE=caps, IX=ABI word (also stored in
-`UNETLD.HANDLE`/`CAPS`/`ABI`).
-CF=1, A=`UNETLD_E_LOAD` (libman `l_load` failed - see
-`LIBMAN.l_reason`/`l_dss_error`/`l_load_stage`/`l_init_status`, active with
-`LIBMAN_DIAGNOSTICS`), `E_INFO` (`l_info` failed), `E_NAME` (the DLL's L1
-name does not start with `UNET` + your tag), `E_CALL` (dispatcher failure,
-or a non-OK status, while calling `GETCAPS`), or `E_ABI` (the major byte of
-`GETCAPS`'s ABI word does not match `HIGH(UNET_ABI_VERSION)`).
-On any CF=1 here **except** `E_LOAD`, a DLL handle is open - call `UNLOAD`
-before retrying or exiting.
-
-### `UNETLD.CALL`
-Dispatch one UNET function on the loaded DLL. This is the whole body:
-`LD HL,(UNETLD.HANDLE) / JP LIBMAN.l_call`.
-In: B = `UNET_FN_*`, arguments in A/DE/IX/IY per `unet.inc`.
-Out: CF=1 only on a libman dispatcher/DSS failure; otherwise A holds the
-UNET `NERR_*` status (test A, not CF) and results are in A/DE/IX/IY.
-The handle is a plain libman handle - calling `LIBMAN.l_call`/`l_info`/
-`l_free` with it directly instead of through this wrapper works fine any
-time.
-
-### `UNETLD.NETSTART`
-Check the configuration, then initialise the backend. Note this does *not*
-bring the network up - that is the backend kit's job (`NETUP`, or
-`NETCFG`/`IFUP`), done beforehand, and it is what publishes the `NET_*`
-environment. `NETSTART` only makes the DLL ready to use that network:
-`STATUS(0xFF)` (intentionally non-hardware - it just confirms the
-environment is there), accepting `NERR_OK` or `NERR_NONET`, then `NETINIT`,
-which initialises the driver and its hardware (locating the UART / probing
-the card, flow control, multi-connection mode).
-In: - Requires a prior successful `LOAD`.
-Out: CF=0, A=0, the NETINIT flag set.
-CF=1, A=`UNETLD_E_CALL` (dispatcher failure), `E_STATUS` (`STATUS`
-returned neither `NERR_OK` nor `NERR_NONET`), or `E_NETINIT` (`NETINIT`
-returned a non-OK status). The `NERR_*` code is in `UNETLD.LAST_STATUS`.
-
-### `UNETLD.REQUIRE`
-Capability gate.
-In: DE = required `UNET_CAP_*` mask (bits may be combined).
-Out: CF=0 if every requested bit is set in `UNETLD.CAPS`; CF=1 otherwise.
-Does not touch `UNETLD.ERROR` - report a missing capability yourself.
-
-### `UNETLD.UNLOAD`
-Idempotent teardown, safe to call on every error path and more than once:
-`NETDONE` (if `NETINIT` had succeeded) then `l_free` (if a DLL is loaded), both
-best-effort, then the whole state block is zeroed via `RESET`.
-Out: CF=0 always.
+`UNETLD.CALL`'s whole body is `LD HL,(UNETLD.HANDLE) / JP LIBMAN.l_call` -
+the handle is a plain libman handle, so calling `LIBMAN.l_call`/`l_info`/
+`l_free` with it directly, bypassing this wrapper, works fine any time.
 
 ## State (read-only, same label names in both placement modes)
 
@@ -162,6 +113,9 @@ Out: CF=0 always.
 | `UNETLD.STATE_END` | - | first free address after the block |
 
 ## Error codes (`UNETLD_E_*`, plain global constants - not module-qualified)
+
+Defined in [abi/unet_abi.toml in core](https://github.com/witchcraft2001/sprinter_unet_libs_core/blob/main/abi/unet_abi.toml)
+(group `unetld_e`), rendered here via `extern/core/bindings/asm/unet.inc`.
 
 | Constant | Value | Set by |
 | --- | --- | --- |
@@ -209,10 +163,8 @@ not part of the consumer-facing API.
 
 ## Adding a backend
 
-1. Vendor `dll/UNET<TAG>.DLL` (built against the frozen `unet.inc` ABI) and
-   add its entry to `dll/manifest.json`.
-2. If its `NET` value should differ from its DLL tag (like `WIFI` -> `ESP`),
-   add one row to `ALIAS_TABLE` in `unetld.asm`. Otherwise nothing else
-   changes - once the new backend's bring-up tool publishes `NET=<TAG>`
-   (the way `NETUP` publishes `NET=WIFI` and `NETCFG`/`IFUP` publish
-   `NET=RTL` - users never set `NET` by hand), everything above just works.
+See [UNETLD-SPEC.md#adding-a-backend in core](https://github.com/witchcraft2001/sprinter_unet_libs_core/blob/main/docs/UNETLD-SPEC.md#adding-a-backend)
+for the general steps (vendor the DLL into core, add an alias-table row
+only if the tag differs from `NET`'s value). The asm-specific part is
+adding that row to `ALIAS_TABLE` in `unetld.asm` - the Pascal and Solid C
+ports each keep their own equivalent table, all three in sync.

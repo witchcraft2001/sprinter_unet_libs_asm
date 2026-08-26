@@ -18,7 +18,14 @@ if [[ ! -f "$libman_asm" ]]; then
   exit 1
 fi
 
-"$script_dir/check_dlls.py"
+core_unet_inc="$repo_root/extern/core/bindings/asm/unet.inc"
+if [[ ! -f "$core_unet_inc" ]]; then
+  echo "Error: $core_unet_inc not found." >&2
+  echo "Run: git submodule update --init --recursive" >&2
+  exit 1
+fi
+
+LIBMAN_ROOT="$repo_root/extern/libman" python3 "$repo_root/extern/core/tools/check_dlls.py" --require-mkdll
 
 mkdir -p "$build_dir"
 
@@ -26,7 +33,8 @@ build_example() {
   local name="$1"
   local dir="$2"
   sjasmplus --nologo --fullpath \
-    -I "$repo_root/include" -I "$repo_root/examples/common" -I "$repo_root/extern/libman/libman" \
+    -I "$repo_root/include" -I "$repo_root/extern/core/bindings/asm" \
+    -I "$repo_root/examples/common" -I "$repo_root/extern/libman/libman" \
     --lst="$build_dir/$name.lst" --sym="$build_dir/$name.sym" \
     --raw="$build_dir/$name.EXE" "$repo_root/examples/$dir/$dir.asm"
   "$script_dir/check_exe.py" "$build_dir/$name.EXE"
@@ -49,5 +57,5 @@ case "$target" in
     ;;
 esac
 
-cp "$repo_root/dll/UNETESP.DLL" "$build_dir/UNETESP.DLL"
-cp "$repo_root/dll/UNETRTL.DLL" "$build_dir/UNETRTL.DLL"
+cp "$repo_root/extern/core/dll/UNETESP.DLL" "$build_dir/UNETESP.DLL"
+cp "$repo_root/extern/core/dll/UNETRTL.DLL" "$build_dir/UNETRTL.DLL"
