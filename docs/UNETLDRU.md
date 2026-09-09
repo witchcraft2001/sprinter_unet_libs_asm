@@ -10,13 +10,13 @@ Read this in English: [UNETLD.md](UNETLD.md).
 Языко-нейтральное *поведение* (алгоритм выбора бекенда, две независимые
 плоскости ошибок, что делает каждая точка входа и почему, коды
 `UNETLD_E_*`/`UNETLD_F_*`) — см.
-[UNETLD-SPECRU.md в sprinter_unet_libs_core](https://github.com/witchcraft2001/sprinter_unet_libs_core/blob/main/docs/UNETLD-SPECRU.md) —
+[UNETLD-SPECRU.md в unet_libs_core](https://github.com/witchcraft2001/unet_libs_core/blob/main/docs/UNETLD-SPECRU.md) —
 это контракт, которому одинаково удовлетворяют эта реализация на asm, порт
 на Pascal и порт на Solid C.
 
 Сам контракт функций UNET (номера, регистровые соглашения, коды ошибок,
 биты возможностей) — см.
-[UNETAPIRU.md в core](https://github.com/witchcraft2001/sprinter_unet_libs_core/blob/main/docs/UNETAPIRU.md).
+[UNETAPIRU.md в core](https://github.com/witchcraft2001/unet_libs_core/blob/main/docs/UNETAPIRU.md).
 
 ## Выбор бекенда
 
@@ -27,7 +27,7 @@ Read this in English: [UNETLD.md](UNETLD.md).
 в конце `unetld.asm` — обычному новому бекенду правки кода вообще не нужны,
 достаточно положить в core соответствующий `UNET<тег>.DLL`. Полный
 алгоритм:
-[UNETLD-SPECRU.md#выбор-бекенда-select](https://github.com/witchcraft2001/sprinter_unet_libs_core/blob/main/docs/UNETLD-SPECRU.md#выбор-бекенда-select).
+[UNETLD-SPECRU.md#выбор-бекенда-select](https://github.com/witchcraft2001/unet_libs_core/blob/main/docs/UNETLD-SPECRU.md#выбор-бекенда-select).
 
 ## Два режима размещения состояния
 
@@ -119,7 +119,7 @@ UNETLD-SPECRU.md).
 
 ## Коды ошибок (`UNETLD_E_*` — обычные глобальные константы, без префикса модуля)
 
-Заданы в [abi/unet_abi.toml в core](https://github.com/witchcraft2001/sprinter_unet_libs_core/blob/main/abi/unet_abi.toml)
+Заданы в [abi/unet_abi.toml в core](https://github.com/witchcraft2001/unet_libs_core/blob/main/abi/unet_abi.toml)
 (группа `unetld_e`), рендерятся сюда через
 `extern/core/bindings/asm/unet.inc`.
 
@@ -171,7 +171,7 @@ libman в той же таблице, что и ваши, а `UNETLD.UNLOAD` о�
 
 ## Добавление бекенда
 
-См. [UNETLD-SPECRU.md#добавление-бекенда в core](https://github.com/witchcraft2001/sprinter_unet_libs_core/blob/main/docs/UNETLD-SPECRU.md#добавление-бекенда)
+См. [UNETLD-SPECRU.md#добавление-бекенда в core](https://github.com/witchcraft2001/unet_libs_core/blob/main/docs/UNETLD-SPECRU.md#добавление-бекенда)
 для общих шагов (положить DLL в core, добавить строку в таблицу алиасов
 только если тег отличается от значения `NET`). Asm-специфичная часть —
 добавить эту строку в `ALIAS_TABLE` в `unetld.asm`; порты на Pascal и Solid

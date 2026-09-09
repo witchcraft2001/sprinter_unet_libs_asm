@@ -2,7 +2,7 @@
 
 Биндинги и примеры для Z80/SjASMPlus для поддержки сети UNET в проекте
 Sprinter (Z80 / DSS). Бекенд-DLL, замороженный ABI и справочник API живут в
-[sprinter_unet_libs_core](https://github.com/witchcraft2001/sprinter_unet_libs_core)
+[unet_libs_core](https://github.com/witchcraft2001/unet_libs_core)
 (подключается как `extern/core`); этот репозиторий добавляет:
 
 - [libman](https://github.com/witchcraft2001/sprinter-libman) вложенным
@@ -12,7 +12,7 @@ Sprinter (Z80 / DSS). Бекенд-DLL, замороженный ABI и спра
   переменную среды `NET`, загружает соответствующую DLL, проверяет её и
   даёт тонкую обёртку вызова плюс жизненный цикл NETINIT/NETDONE - см.
   [docs/UNETLDRU.md](docs/UNETLDRU.md) (asm-специфичный справочник) и
-  [UNETLD-SPECRU.md из core](https://github.com/witchcraft2001/sprinter_unet_libs_core/blob/main/docs/UNETLD-SPECRU.md)
+  [UNETLD-SPECRU.md из core](https://github.com/witchcraft2001/unet_libs_core/blob/main/docs/UNETLD-SPECRU.md)
   (языко-нейтральная спецификация поведения);
 - четыре рабочих примера (`NETINFO`, `PING`, `HTTPGET`, `UDPECHO`).
 
@@ -96,9 +96,9 @@ libman ищет простое имя DLL сначала в каталоге EXE
 ## Переменные среды и правила работы с памятью
 
 Оба вопроса - свойства самого UNET ABI, а не этого репозитория - см.
-[README core](https://github.com/witchcraft2001/sprinter_unet_libs_core#переменные-среды)
+[README core](https://github.com/witchcraft2001/unet_libs_core#переменные-среды)
 про правила выбора `NET` и инструменты настройки, и
-[правила работы с памятью в core](https://github.com/witchcraft2001/sprinter_unet_libs_core#правила-работы-с-памятью)
+[правила работы с памятью в core](https://github.com/witchcraft2001/unet_libs_core#правила-работы-с-памятью)
 про ограничения по окнам и буферам. Одно asm-специфичное добавление сверх
 них: для любого вызова `RST 0x10`/`RST 0x08` (DSS/BIOS) `SP` обязан быть в
 диапазоне `0x8000`-`0xBFFF`, а `HL'`/`DE'`/`BC'` зарезервированы DSS/BIOS -
@@ -143,8 +143,8 @@ UDPECHO <хост> 7777          - в паре с `python3 extern/core/tools/udp
 
 ## Обновление вендоренных DLL и ABI
 
-Оба теперь живут в `sprinter_unet_libs_core` - см.
-[README core](https://github.com/witchcraft2001/sprinter_unet_libs_core#обновление-вендоренных-dll)
+Оба теперь живут в `unet_libs_core` - см.
+[README core](https://github.com/witchcraft2001/unet_libs_core#обновление-вендоренных-dll)
 про `update_dlls.sh` и про работу с источником истины ABI
 (`abi/unet_abi.toml` + `gen_bindings.py`). После обновления core обновите
 здесь указатель сабмодуля `extern/core`.

@@ -2,7 +2,7 @@
 
 Z80/SjASMPlus bindings and examples for UNET network support on a Sprinter
 (Z80 / DSS) project. The backend DLLs, the frozen ABI and the API reference
-live in [sprinter_unet_libs_core](https://github.com/witchcraft2001/sprinter_unet_libs_core)
+live in [unet_libs_core](https://github.com/witchcraft2001/unet_libs_core)
 (pulled in as `extern/core`); this repo adds:
 
 - [libman](https://github.com/witchcraft2001/sprinter-libman) as a nested
@@ -11,7 +11,7 @@ live in [sprinter_unet_libs_core](https://github.com/witchcraft2001/sprinter_une
   environment variable, loads the matching DLL, validates it, and gives you
   a thin call wrapper plus a NETINIT/NETDONE lifecycle - see
   [docs/UNETLD.md](docs/UNETLD.md) (asm-specific reference) and
-  [core's UNETLD-SPEC.md](https://github.com/witchcraft2001/sprinter_unet_libs_core/blob/main/docs/UNETLD-SPEC.md)
+  [core's UNETLD-SPEC.md](https://github.com/witchcraft2001/unet_libs_core/blob/main/docs/UNETLD-SPEC.md)
   (language-neutral behavior spec);
 - four runnable examples (`NETINFO`, `PING`, `HTTPGET`, `UDPECHO`).
 
@@ -96,9 +96,9 @@ against either.
 ## Environment variables and memory-map rules
 
 Both are properties of the UNET ABI itself, not this repo - see
-[core's README](https://github.com/witchcraft2001/sprinter_unet_libs_core#environment-variables)
+[core's README](https://github.com/witchcraft2001/unet_libs_core#environment-variables)
 for the `NET` selection rules and bring-up tools, and
-[core's memory-map rules](https://github.com/witchcraft2001/sprinter_unet_libs_core#memory-map-rules)
+[core's memory-map rules](https://github.com/witchcraft2001/unet_libs_core#memory-map-rules)
 for the window/buffer constraints. One asm-specific addition on top of
 those: for any `RST 0x10`/`RST 0x08` (DSS/BIOS) call, `SP` must be inside
 `0x8000`-`0xBFFF`, and `HL'`/`DE'`/`BC'` are DSS/BIOS-reserved - never `EXX`
@@ -143,8 +143,8 @@ error paths - in normal use `NET` is only ever published by a bring-up tool.)
 
 ## Maintaining the vendored DLLs and the ABI
 
-Both now live in `sprinter_unet_libs_core` - see
-[core's README](https://github.com/witchcraft2001/sprinter_unet_libs_core#maintaining-the-vendored-dlls)
+Both now live in `unet_libs_core` - see
+[core's README](https://github.com/witchcraft2001/unet_libs_core#maintaining-the-vendored-dlls)
 for `update_dlls.sh` and the ABI source-of-truth workflow
 (`abi/unet_abi.toml` + `gen_bindings.py`). Bump the `extern/core` submodule
 pointer here after a core update.

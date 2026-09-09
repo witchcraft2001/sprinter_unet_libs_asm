@@ -3,4 +3,5 @@
 	url = https://github.com/witchcraft2001/sprinter-libman.git
 [submodule "extern/core"]
 	path = extern/core
-	url = https://github.com/witchcraft2001/sprinter_unet_libs_core.git
+	url = https://github.com/witchcraft2001/unet_libs_core.git
+	branch = main

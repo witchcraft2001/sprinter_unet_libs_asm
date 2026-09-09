@@ -10,11 +10,11 @@ and integration notes for this repo.
 For the language-neutral *behavior* (the backend-selection algorithm, the
 two independent failure planes, what each entry point does and why, the
 `UNETLD_E_*`/`UNETLD_F_*` codes) see
-[UNETLD-SPEC.md in sprinter_unet_libs_core](https://github.com/witchcraft2001/sprinter_unet_libs_core/blob/main/docs/UNETLD-SPEC.md) -
+[UNETLD-SPEC.md in unet_libs_core](https://github.com/witchcraft2001/unet_libs_core/blob/main/docs/UNETLD-SPEC.md) -
 that document is the contract this asm implementation, the Pascal port and
 the Solid C port all satisfy identically.
 
-See [UNETAPI.md in core](https://github.com/witchcraft2001/sprinter_unet_libs_core/blob/main/docs/UNETAPI.md)
+See [UNETAPI.md in core](https://github.com/witchcraft2001/unet_libs_core/blob/main/docs/UNETAPI.md)
 for the UNET function contract itself (function numbers, register
 conventions, error codes, capability bits).
 
@@ -26,7 +26,7 @@ upper-cased automatically); the DLL name is built directly from that value
 `UNETESP.DLL`. See `ALIAS_TABLE` near the end of `unetld.asm` to add
 another - a normal new backend needs no code changes at all, just vendor
 the matching `UNET<tag>.DLL` into core. Full algorithm:
-[UNETLD-SPEC.md#backend-selection-select](https://github.com/witchcraft2001/sprinter_unet_libs_core/blob/main/docs/UNETLD-SPEC.md#backend-selection-select).
+[UNETLD-SPEC.md#backend-selection-select](https://github.com/witchcraft2001/unet_libs_core/blob/main/docs/UNETLD-SPEC.md#backend-selection-select).
 
 ## Two state-placement modes
 
@@ -114,7 +114,7 @@ the handle is a plain libman handle, so calling `LIBMAN.l_call`/`l_info`/
 
 ## Error codes (`UNETLD_E_*`, plain global constants - not module-qualified)
 
-Defined in [abi/unet_abi.toml in core](https://github.com/witchcraft2001/sprinter_unet_libs_core/blob/main/abi/unet_abi.toml)
+Defined in [abi/unet_abi.toml in core](https://github.com/witchcraft2001/unet_libs_core/blob/main/abi/unet_abi.toml)
 (group `unetld_e`), rendered here via `extern/core/bindings/asm/unet.inc`.
 
 | Constant | Value | Set by |
@@ -163,7 +163,7 @@ not part of the consumer-facing API.
 
 ## Adding a backend
 
-See [UNETLD-SPEC.md#adding-a-backend in core](https://github.com/witchcraft2001/sprinter_unet_libs_core/blob/main/docs/UNETLD-SPEC.md#adding-a-backend)
+See [UNETLD-SPEC.md#adding-a-backend in core](https://github.com/witchcraft2001/unet_libs_core/blob/main/docs/UNETLD-SPEC.md#adding-a-backend)
 for the general steps (vendor the DLL into core, add an alias-table row
 only if the tag differs from `NET`'s value). The asm-specific part is
 adding that row to `ALIAS_TABLE` in `unetld.asm` - the Pascal and Solid C
